@@ -1,0 +1,64 @@
+<!-- Import Polymer -->
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<!--
+`html-content` ...
+
+Example:
+
+    <html-content content="<h1>Hello world</h1>"></html-content>
+
+@class html-content
+@homepage .
+-->
+
+<!-- Define your custom element -->
+<polymer-element name="html-content" attributes="content">
+    <template>
+        <style>
+        img {
+            max-width: 100%;
+        }
+        </style>
+        <div id="contentDiv"></div>
+    </template>
+
+    <script>
+        Polymer('html-content', {
+
+            /**
+             * The html content to show.
+             *
+             * @type {string}
+             */
+            content: '',
+
+            // Fires when an instance of the element is created
+            created: function() {},
+
+            // Fires when the "<polymer-element>" has been fully prepared
+            ready: function() {},
+
+            // Fires when the element was inserted into the document
+            attached: function() {
+                this.setContentDiv_();
+            },
+
+            // Fires when the element’s initial set of children and siblings are guaranteed to exist
+            domReady: function() {},
+
+            // Fires when the element was removed from the document
+            detached: function() {},
+
+            // Fires when an attribute was added, removed, or updated
+            attributeChanged: function(attr, oldVal, newVal) {
+                this.setContentDiv_();
+            },
+
+            setContentDiv_: function() {
+                this.$.contentDiv.innerHTML = this.content;
+            }
+        });
+    </script>
+
+</polymer-element>

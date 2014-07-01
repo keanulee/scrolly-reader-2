@@ -1,0 +1,152 @@
+<!-- Import Polymer -->
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/core-animation/core-animation.html">
+
+<!--
+`page-scroll-view` ...
+
+Example:
+
+    <page-scroll-view>
+        <div page>...</div>
+        <div page>...</div>
+        <div page>...</div>
+    </page-scroll-view>
+
+@class page-scroll-view
+@homepage .
+-->
+
+<!-- Define your custom element -->
+<polymer-element name="page-scroll-view">
+
+    <template>
+        <style>
+        :host {
+            display: block;
+            width: 100%;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            /*-webkit-overflow-scrolling: touch;*/
+            white-space: nowrap;
+        }
+
+        ::content [page] {
+            display: inline-block;
+            white-space: normal;
+        }
+        </style>
+
+        <content></content>
+    </template>
+
+    <script>
+        Polymer('page-scroll-view', {
+            scrollTimer_: null,
+
+            snapScrollDelay: 100,
+
+            snapScrollTiming: 200,
+
+            /**
+             * The currently playing animation player, if any. Used to detect if an
+             * animation is currently playing.
+             *
+             * @type {AnimationPlayer}
+             */
+            animationPlayer_: null,
+
+            // Fires when an instance of the element is created
+            created: function() {},
+
+            // Fires when the "<polymer-element>" has been fully prepared
+            ready: function() {},
+
+            // Fires when the element was inserted into the document
+            attached: function() {
+                this.addEventListener('scroll', this.scrollHandler_);
+                this.addEventListener('touchstart', function() {
+                    this.userIsTouching_ = true;
+                }.bind(this));
+                this.addEventListener('touchend', function() {
+                    this.userIsTouching_ = false;
+                    this.scrollHandler_();
+                }.bind(this));
+            },
+
+            // Fires when the element’s initial set of children and siblings are guaranteed to exist
+            domReady: function() {},
+
+            // Fires when the element was removed from the document
+            detached: function() {},
+
+            // Fires when an attribute was added, removed, or updated
+            attributeChanged: function(attr, oldVal, newVal) {},
+
+            snapToChild: function(child) {
+                var startLeft = this.scrollLeft;
+                var endLeft = child.offsetLeft;
+
+                var animation = new Animation(this, function(timeFraction, target, animation) {
+                    if (timeFraction === null) return;
+                    target.scrollLeft = timeFraction * endLeft + (1 - timeFraction) * startLeft;
+                }, this.snapScrollTiming);
+                this.animationPlayer_ = document.timeline.play(animation);
+                this.animationPlayer_.onfinish = function() {
+                    this.scrollLeft = endLeft;
+
+                    // Since we programatically set the scroll position above, we need to
+                    // wait until the scroll event is triggered by that line before
+                    // resetting this.animationPlayer_.
+                    window.setTimeout(function() {
+                        this.animationPlayer_ = null;
+                    }.bind(this), 100)
+                }.bind(this);
+            },
+
+            scrollHandler_: function(evt) {
+                // Don't trigger scrollEndHandler_ if the scroll events were triggered
+                // programatically.
+                if (this.animationPlayer_ || this.userIsTouching_) return;
+
+                if (this.scrollTimer_) {
+                    window.clearTimeout(this.scrollTimer_);
+                }
+                this.scrollTimer_ = window.setTimeout(this.scrollEndHandler_.bind(this, evt), this.snapScrollDelay);
+            },
+
+            scrollEndHandler_: function(evt) {
+                var closestChild = this.findClosestChild_();
+                if (!closestChild) return;
+
+                this.snapToChild(closestChild);
+            },
+
+            findClosestChild_: function() {
+                var numChildren = this.children.length;
+                if (numChildren === 0) return null;
+
+                var scrollLeft = this.scrollLeft;
+                var lastChild = this.children[0];
+                var lastChildDistance = Math.abs(lastChild.offsetLeft - scrollLeft);
+
+                for (var i = 1; i < numChildren; i++) {
+                    var currentChild = this.children[i];
+                    var currentChildDistance = Math.abs(currentChild.offsetLeft - scrollLeft);
+
+                    if (currentChild.offsetLeft >= this.scrollLeft) {
+                        if (currentChildDistance < lastChildDistance) return currentChild;
+                        else return lastChild;
+                    }
+
+                    lastChild = currentChild;
+                    lastChildDistance = currentChildDistance;
+                }
+
+                return lastChild;
+            }
+        });
+    </script>
+
+</polymer-element>

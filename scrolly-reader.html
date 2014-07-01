@@ -1,0 +1,156 @@
+<!-- Import Polymer -->
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/core-scroll-header-panel/core-scroll-header-panel.html?rand=234235re">
+<link rel="import" href="bower_components/core-icon-button/core-icon-button.html">
+<link rel="import" href="bower_components/core-toolbar/core-toolbar.html">
+<link rel="import" href="bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="html-content.html">
+<link rel="import" href="page-scroll-view.html">
+
+<!--
+`scrolly-reader` ...
+
+Example:
+
+    <scrolly-reader title="Engadget" src="http://www.engadget.com/rss-hd.xml"></scrolly-reader>
+
+@class scrolly-reader
+@homepage .
+-->
+
+<!-- Define your custom element -->
+<polymer-element name="scrolly-reader" attributes="title src">
+    <template>
+        <style>
+        page-scroll-view {
+            background-color: #FFF;
+            -webkit-transition: all 0.2s;
+            transition: all 0.2s;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        page-scroll-view.collapsed {
+            height: 150px;
+        }
+
+        page-scroll-view:not(.collapsed) {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        core-scroll-header-panel {
+            width: 100%;
+            height: 100%;
+        }
+
+        .collapsed core-scroll-header-panel {
+            width: 150px;
+        }
+    
+        /* background for toolbar when it is at its full size */
+        core-scroll-header-panel::shadow #headerBg {
+            background-color: rgb(207, 216, 220);
+        }
+        
+        /* background for toolbar when it is condensed */
+        core-scroll-header-panel::shadow #condensedHeaderBg {
+            background-color: #f4b400;
+        }
+
+        core-toolbar {
+            -webkit-transition: font-size 0.2s;
+            transition: font-size 0.2s;
+        }
+
+        .collapsed core-toolbar {
+            font-size: 1em;
+        }
+
+        core-toolbar::shadow #bottomBar {
+            -webkit-transition: height 0.2s;
+            transition: height 0.2s;
+        }
+
+        .collapsed core-toolbar::shadow #bottomBar {
+            height: 100%;
+        }
+
+        .collapsed core-icon-button {
+            display: none;
+        }
+
+        #heading {
+            -webkit-transition: margin 0.2s;
+            transition: margin 0.2s;
+            overflow: hidden;
+            max-height: 48px;
+        }
+
+        .collapsed #heading {
+            margin-left: 8px;
+            cursor: pointer;
+            max-height: 90px;
+        }
+
+        html-content {
+            display: block;
+            padding: 10px 30px;
+        }
+
+        .collapsed html-content {
+            display: none;
+        }
+        </style>
+
+        <core-ajax id="ajax" auto
+            url="https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D%22{{src}}%22&format=json&callback="
+            handleAs="json"
+            response="{{response}}"></core-ajax>
+
+        <div>{{title}}</div>
+
+        <page-scroll-view id="scrollView" class="collapsed">
+            <template repeat="{{response.query.results.item}}">
+                <core-scroll-header-panel page condenses>
+                    <core-toolbar class="tall">
+                        <core-icon-button icon="arrow-back" on-tap="{{collapse}}"></core-icon-button>
+                        <div id="heading" class="bottom indent">{{title}}</div>
+                    </core-toolbar>
+                    <html-content content="{{description}}"></html-content>
+                </core-scroll-header-panel>
+            </template>
+        </page-scroll-view>
+    </template>
+
+    <script>
+        Polymer('scrolly-reader', {
+
+            // Fires when an instance of the element is created
+            created: function() {},
+
+            // Fires when the "<polymer-element>" has been fully prepared
+            ready: function() {},
+
+            // Fires when the element was inserted into the document
+            attached: function() {
+                this.$.scrollView.addEventListener('click', function() {
+                    this.$.scrollView.classList.toggle('collapsed')
+                }.bind(this));
+            },
+
+            // Fires when the element’s initial set of children and siblings are guaranteed to exist
+            domReady: function() {},
+
+            // Fires when the element was removed from the document
+            detached: function() {},
+
+            // Fires when an attribute was added, removed, or updated
+            attributeChanged: function(attr, oldVal, newVal) {}
+        });
+    </script>
+
+</polymer-element>

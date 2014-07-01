@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <title>&lt;scrolly-reader&gt;</title>
+
+    <!-- Importing Web Component's Polyfill -->
+    <script src="bower_components/platform/platform.js"></script>
+
+    <!-- Importing Custom Elements -->
+    <link rel="import" href="scrolly-reader.html">
+
+    <style>
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        margin: 0;
+        font-family: sans-serif;
+    }
+
+    scrolly-reader {
+        width: 100%;
+        height: 100%;
+    }
+
+    /**
+     * HACK: The ::content CSS selector is not supported in Safari, so we need to
+     * include styling for *[page] here as well.
+     */
+    [page] {
+        display: inline-block;
+        white-space: normal;
+    }
+
+    #mainContainer {
+        -webkit-overflow-scrolling: touch;
+    }
+    </style>
+</head>
+<body unresolved>
+    <scrolly-reader title="Engadget" src="http://www.engadget.com/rss-hd.xml"></scrolly-reader>
+    <scrolly-reader title="CNET" src="http://www.cnet.com/rss/news/"></scrolly-reader>
+    <scrolly-reader title="MacRumors" src="http://feeds.macrumors.com/MacRumors-All"></scrolly-reader>
+
+    <script>
+        // (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        // (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        // m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        // })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        // ga('create', 'UA-39573523-3', 'auto');
+        // ga('send', 'pageview');
+
+    </script>
+</body>
+</html>
